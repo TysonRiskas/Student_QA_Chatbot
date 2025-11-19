@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Merge Users - Admin Panel</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f5f5;
+        }
+        
+        .navbar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        .navbar h1 {
+            font-size: 24px;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            padding: 8px 16px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 6px;
+            transition: background 0.3s;
+            font-size: 14px;
+        }
+        
+        .nav-links a:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+        
+        .section {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .section h2 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #ecf0f1;
+        }
+        
+        .warning-box {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 20px;
+            margin-bottom: 30px;
+            border-radius: 6px;
+        }
+        
+        .warning-box h3 {
+            color: #856404;
+            margin-bottom: 10px;
+        }
+        
+        .warning-box ul {
+            margin-left: 20px;
+            color: #856404;
+        }
+        
+        .warning-box ul li {
+            margin-bottom: 5px;
+        }
+        
+        .merge-container {
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            gap: 20px;
+            align-items: start;
+            margin-bottom: 30px;
+        }
+        
+        .user-select-box {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            border: 2px solid #dee2e6;
+        }
+        
+        .user-select-box h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 16px;
+        }
+        
+        .user-select-box select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+        
+        .user-preview {
+            padding: 15px;
+            background: white;
+            border-radius: 6px;
+            border: 1px solid #dee2e6;
+            font-size: 13px;
+            min-height: 150px;
+        }
+        
+        .user-preview p {
+            margin-bottom: 8px;
+            color: #495057;
+        }
+        
+        .user-preview strong {
+            color: #2c3e50;
+        }
+        
+        .arrow {
+            font-size: 48px;
+            color: #667eea;
+            text-align: center;
+            padding-top: 60px;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #764ba2;
+        }
+        
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background: #c82333;
+        }
+        
+        .btn-secondary {
+            background: #95a5a6;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: #7f8c8d;
+        }
+        
+        .alert {
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+        }
+        
+        .alert-error {
+            background: #fee;
+            color: #c33;
+            border-left: 4px solid #c33;
+        }
+        
+        .alert-success {
+            background: #efe;
+            color: #3c3;
+            border-left: 4px solid #3c3;
+        }
+    </style>
+    <script>
+        function updatePreview(selectId, previewId) {
+            const select = document.getElementById(selectId);
+            const preview = document.getElementById(previewId);
+            const option = select.options[select.selectedIndex];
+            
+            if (option.value) {
+                preview.innerHTML = `
+                    <p><strong>Name:</strong> ${option.dataset.name}</p>
+                    <p><strong>Email:</strong> ${option.dataset.email}</p>
+                    <p><strong>Student ID:</strong> ${option.dataset.studentid}</p>
+                    <p><strong>Section:</strong> ${option.dataset.section || 'N/A'}</p>
+                    <p><strong>Conversations:</strong> ${option.dataset.convcount}</p>
+                `;
+            } else {
+                preview.innerHTML = '<p style="color: #adb5bd;">Select a user to see details</p>';
+            }
+        }
+        
+        function confirmMerge(event) {
+            const sourceSelect = document.getElementById('source_user_id');
+            const targetSelect = document.getElementById('target_user_id');
+            
+            if (!sourceSelect.value || !targetSelect.value) {
+                alert('Please select both users to merge');
+                event.preventDefault();
+                return false;
+            }
+            
+            if (sourceSelect.value === targetSelect.value) {
+                alert('Cannot merge a user with themselves. Please select different users.');
+                event.preventDefault();
+                return false;
+            }
+            
+            const sourceName = sourceSelect.options[sourceSelect.selectedIndex].dataset.name;
+            const targetName = targetSelect.options[targetSelect.selectedIndex].dataset.name;
+            const sourceConvs = sourceSelect.options[sourceSelect.selectedIndex].dataset.convcount;
+            
+            const confirmed = confirm(
+                `⚠️ WARNING: This action cannot be undone!\n\n` +
+                `You are about to merge:\n` +
+                `FROM: ${sourceName}\n` +
+                `INTO: ${targetName}\n\n` +
+                `This will:\n` +
+                `• Transfer ${sourceConvs} conversation(s)\n` +
+                `• Delete the source account (${sourceName})\n` +
+                `• Keep the target account (${targetName})\n\n` +
+                `Do you want to continue?`
+            );
+            
+            if (!confirmed) {
+                event.preventDefault();
+                return false;
+            }
+            
+            return true;
+        }
+    </script>
+</head>
+<body>
+    <div class="navbar">
+        <h1>🔀 Merge User Accounts</h1>
+        <div class="nav-links">
+            <a href="/admin/dashboard">Dashboard</a>
+            <a href="/admin/users">Users</a>
+            <a href="/admin/logout">Logout</a>
+        </div>
+    </div>
+    
+    <div class="container">
+        <div class="section">
+            <h2>Merge Duplicate User Accounts</h2>
+            
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+            
+            <div class="warning-box">
+                <h3>⚠️ Important: This action cannot be undone!</h3>
+                <ul>
+                    <li>All conversations from the source user will be transferred to the target user</li>
+                    <li>The source user account will be permanently deleted</li>
+                    <li>The target user account will remain with all merged conversations</li>
+                    <li>Use this feature to combine duplicate accounts or correct data entry errors</li>
+                </ul>
+            </div>
+            
+            <form method="POST" onsubmit="return confirmMerge(event)">
+                <div class="merge-container">
+                    <div class="user-select-box">
+                        <h3>📤 Source User (will be deleted)</h3>
+                        <select id="source_user_id" name="source_user_id" 
+                                onchange="updatePreview('source_user_id', 'source_preview')" required>
+                            <option value="">-- Select User to Merge FROM --</option>
+                            {% for user in users %}
+                            <option value="{{ user.id }}"
+                                    data-name="{{ user.first_name }} {{ user.last_name }}"
+                                    data-email="{{ user.email }}"
+                                    data-studentid="{{ user.student_id }}"
+                                    data-section="{{ user.course_section or 'N/A' }}"
+                                    data-convcount="{{ user.conversations.count() }}">
+                                {{ user.email }} - {{ user.first_name }} {{ user.last_name }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                        <div id="source_preview" class="user-preview">
+                            <p style="color: #adb5bd;">Select a user to see details</p>
+                        </div>
+                    </div>
+                    
+                    <div class="arrow">→</div>
+                    
+                    <div class="user-select-box">
+                        <h3>📥 Target User (will keep)</h3>
+                        <select id="target_user_id" name="target_user_id" 
+                                onchange="updatePreview('target_user_id', 'target_preview')" required>
+                            <option value="">-- Select User to Merge INTO --</option>
+                            {% for user in users %}
+                            <option value="{{ user.id }}"
+                                    data-name="{{ user.first_name }} {{ user.last_name }}"
+                                    data-email="{{ user.email }}"
+                                    data-studentid="{{ user.student_id }}"
+                                    data-section="{{ user.course_section or 'N/A' }}"
+                                    data-convcount="{{ user.conversations.count() }}">
+                                {{ user.email }} - {{ user.first_name }} {{ user.last_name }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                        <div id="target_preview" class="user-preview">
+                            <p style="color: #adb5bd;">Select a user to see details</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="button-group">
+                    <button type="submit" class="btn btn-danger">🔀 Merge Accounts</button>
+                    <a href="/admin/users" class="btn btn-secondary">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

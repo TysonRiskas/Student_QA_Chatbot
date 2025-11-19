@@ -1,0 +1,76 @@
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Python
+venv/
+env/
+ENV/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+.python-version
+
+# Flask
+instance/
+.webassets-cache
+.flask_session/
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+backup_*.json
+
+# Migrations (if using Alembic manually)
+migrations/
+
+# Legacy data files
+qa_conversations.json
+users_db.json
+
+# Course materials (large files)
+*.pdf
+*.docx
+*.mp4
+*.pptx
+*.xlsx
+corpus/
+
+# Logs
+*.log
+logs/
+*.pid
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# Testing
+.coverage
+.pytest_cache/
+htmlcov/
+.tox/
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini

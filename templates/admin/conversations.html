@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conversations - Admin Panel</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f5f5;
+        }
+        
+        .navbar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        .navbar h1 {
+            font-size: 24px;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            padding: 8px 16px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 6px;
+            transition: background 0.3s;
+            font-size: 14px;
+        }
+        
+        .nav-links a:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+        
+        .section {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .section h2 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #ecf0f1;
+        }
+        
+        .filters {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .filters input, .filters select {
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+        
+        .filters input {
+            flex: 1;
+            max-width: 400px;
+        }
+        
+        .conversation-card {
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            background: #fafafa;
+        }
+        
+        .conversation-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .user-info {
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        .timestamp {
+            color: #7f8c8d;
+            font-size: 14px;
+        }
+        
+        .question {
+            background: #e3f2fd;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            border-left: 4px solid #2196f3;
+        }
+        
+        .question strong {
+            color: #1976d2;
+            display: block;
+            margin-bottom: 8px;
+        }
+        
+        .answer {
+            background: #f1f8e9;
+            padding: 15px;
+            border-radius: 6px;
+            border-left: 4px solid #8bc34a;
+        }
+        
+        .answer strong {
+            color: #689f38;
+            display: block;
+            margin-bottom: 8px;
+        }
+        
+        .badge {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .badge-registered {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .badge-guest {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .pagination {
+            margin-top: 20px;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .pagination a, .pagination span {
+            padding: 8px 12px;
+            background: #667eea;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+        }
+        
+        .pagination span {
+            background: #ccc;
+        }
+        
+        .pagination a:hover {
+            background: #764ba2;
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <h1>💬 Conversations</h1>
+        <div class="nav-links">
+            <a href="/admin/dashboard">Dashboard</a>
+            <a href="/admin/users">Users</a>
+            <a href="/admin/conversations">Conversations</a>
+            <a href="/admin/analytics">Analytics</a>
+            <a href="/admin/export/users">Export Users</a>
+            <a href="/admin/export/conversations">Export Conversations</a>
+            <a href="/">Student Site</a>
+            <a href="/admin/logout">Logout</a>
+        </div>
+    </div>
+    
+    <div class="container">
+        <div class="section">
+            <h2>All Conversations</h2>
+            
+            <form method="GET" action="/admin/conversations" class="filters">
+                <input type="text" name="search" placeholder="Search questions or answers..." value="{{ search }}">
+                <select name="filter">
+                    <option value="all" {% if filter_type == 'all' %}selected{% endif %}>All Conversations</option>
+                    <option value="registered" {% if filter_type == 'registered' %}selected{% endif %}>Registered Users Only</option>
+                    <option value="guest" {% if filter_type == 'guest' %}selected{% endif %}>Guests Only</option>
+                </select>
+                <button type="submit" style="padding: 10px 20px; background: #667eea; color: white; border: none; border-radius: 6px; cursor: pointer;">Filter</button>
+            </form>
+            
+            {% for conv in conversations %}
+            <div class="conversation-card">
+                <div class="conversation-header">
+                    <div class="user-info">
+                        {% if conv.is_guest %}
+                            {{ conv.guest_first_name }} {{ conv.guest_last_name }} 
+                            <span class="badge badge-guest">Guest</span>
+                        {% else %}
+                            {{ conv.user.first_name if conv.user else 'Unknown' }} {{ conv.user.last_name if conv.user else '' }}
+                            <span class="badge badge-registered">Registered</span>
+                        {% endif %}
+                    </div>
+                    <div style="display: flex; gap: 15px; align-items: center;">
+                        <div class="timestamp">
+                            {{ conv.timestamp.strftime('%Y-%m-%d %H:%M:%S') if conv.timestamp else 'N/A' }}
+                        </div>
+                        <div>
+                            <a href="/admin/conversations/{{ conv.id }}/edit" style="color: #667eea; text-decoration: none; margin-right: 10px;" title="Edit">✏️</a>
+                            <form method="POST" action="/admin/conversations/{{ conv.id }}/delete" style="display: inline;" 
+                                  onsubmit="return confirm('⚠️ Are you sure you want to delete this conversation? This action cannot be undone!');">
+                                <button type="submit" style="background: none; border: none; cursor: pointer; font-size: 16px;" title="Delete">🗑️</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="question">
+                    <strong>Question:</strong>
+                    {{ conv.question }}
+                </div>
+                
+                <div class="answer">
+                    <strong>Answer:</strong>
+                    {{ conv.answer }}
+                </div>
+            </div>
+            {% else %}
+            <div style="text-align: center; padding: 60px; color: #7f8c8d;">
+                <p style="font-size: 18px; margin-bottom: 10px;">📭 No conversations found</p>
+                <p>{% if search %}Try a different search term.{% else %}Students haven't started chatting yet.{% endif %}</p>
+            </div>
+            {% endfor %}
+            
+            {% if pagination.pages > 1 %}
+            <div class="pagination">
+                {% if pagination.has_prev %}
+                <a href="?page={{ pagination.prev_num }}{% if search %}&search={{ search }}{% endif %}{% if filter_type %}&filter={{ filter_type }}{% endif %}">Previous</a>
+                {% endif %}
+                
+                <span>Page {{ pagination.page }} of {{ pagination.pages }}</span>
+                
+                {% if pagination.has_next %}
+                <a href="?page={{ pagination.next_num }}{% if search %}&search={{ search }}{% endif %}{% if filter_type %}&filter={{ filter_type }}{% endif %}">Next</a>
+                {% endif %}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>
