@@ -27,7 +27,8 @@ app = Flask(__name__)
 app.secret_key = os.getenv('SECRET_KEY', 'dev-secret-key-change-in-production')
 app.config['SESSION_TYPE'] = 'filesystem'
 app.config['SESSION_COOKIE_HTTPONLY'] = True
-app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
+app.config['SESSION_COOKIE_SAMESITE'] = 'None'
+app.config['SESSION_COOKIE_SECURE'] = True
 app.config['PERMANENT_SESSION_LIFETIME'] = 3600  # 1 hour session timeout
 
 # Initialize database
@@ -192,7 +193,7 @@ class ChatbotManager:
 chatbot = ChatbotManager()
 
 
-@app.route('/')
+@app.route('/', methods=['GET', 'POST'])
 def index():
     """Main route - redirects to login if no session, otherwise shows chat."""
     # Force check if user_id exists in database for registered users
