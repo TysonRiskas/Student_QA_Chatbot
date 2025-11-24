@@ -65,6 +65,11 @@ class ChatbotCorpus:
             print(f"Loading DOCX: {docx_file.name}")
             corpus_parts.append(self._read_docx(docx_file))
         
+        # Load TXT files
+        for txt_file in self.corpus_dir.glob("*.txt"):
+            print(f"Loading TXT: {txt_file.name}")
+            corpus_parts.append(self._read_txt(txt_file))
+        
         # Load MP4 files (extract metadata/info)
         for mp4_file in self.corpus_dir.glob("*.mp4"):
             print(f"Loading MP4 metadata: {mp4_file.name}")
@@ -96,6 +101,16 @@ class ChatbotCorpus:
             doc = docx.Document(filepath)
             text = "\n".join([para.text for para in doc.paragraphs])
             return f"[DOCX: {filepath.name}]\n" + text
+        except Exception as e:
+            print(f"Error reading {filepath.name}: {e}")
+            return ""
+    
+    def _read_txt(self, filepath):
+        """Read plain text from TXT file."""
+        try:
+            with open(filepath, 'r', encoding='utf-8', errors='ignore') as f:
+                text = f.read()
+            return f"[TXT: {filepath.name}]\n" + text
         except Exception as e:
             print(f"Error reading {filepath.name}: {e}")
             return ""

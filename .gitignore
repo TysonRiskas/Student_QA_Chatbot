@@ -37,14 +37,6 @@ migrations/
 qa_conversations.json
 users_db.json
 
-# Course materials (large files)
-*.pdf
-*.docx
-*.mp4
-*.pptx
-*.xlsx
-corpus/
-
 # Logs
 *.log
 logs/
