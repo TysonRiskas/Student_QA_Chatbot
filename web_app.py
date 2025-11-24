@@ -39,6 +39,11 @@ class ChatbotCorpus:
         
         corpus_parts = []
         
+        # Load TXT files first
+        for txt_file in self.corpus_dir.glob("*.txt"):
+            print(f"Loading TXT: {txt_file.name}")
+            corpus_parts.append(self._read_txt(txt_file))
+        
         # Load PDFs
         for pdf_file in self.corpus_dir.glob("*.pdf"):
             print(f"Loading PDF: {pdf_file.name}")
@@ -48,11 +53,6 @@ class ChatbotCorpus:
         for docx_file in self.corpus_dir.glob("*.docx"):
             print(f"Loading DOCX: {docx_file.name}")
             corpus_parts.append(self._read_docx(docx_file))
-        
-        # Load TXT files
-        for txt_file in self.corpus_dir.glob("*.txt"):
-            print(f"Loading TXT: {txt_file.name}")
-            corpus_parts.append(self._read_txt(txt_file))
         
         # Load MP4 files (extract metadata/info)
         for mp4_file in self.corpus_dir.glob("*.mp4"):
@@ -138,7 +138,7 @@ class ChatbotManager:
             )
             
             if self.corpus.corpus_text:
-                system_message += f"\n\nCourse Materials:\n{self.corpus.corpus_text[:8000]}"
+                system_message += f"\n\nCourse Materials:\n{self.corpus.corpus_text}"
             
             messages = [
                 {"role": "system", "content": system_message},
